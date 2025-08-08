@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Uzuxer - Terminal</title>
+  <style>
+    body {
+      background-color: black;
+      color: white;
+      font-family: monospace;
+      text-align: center;
+      padding: 20px;
+    }
+    h1 {
+      font-size: 2em;
+      margin-bottom: 20px;
+    }
+    .terminal {
+      background-color: #111;
+      border: 2px solid white;
+      border-radius: 10px;
+      padding: 10px;
+      width: 80%;
+      margin: 10px auto;
+      text-align: left;
+      min-height: 50px;
+    }
+    input {
+      width: 95%;
+      background-color: black;
+      border: none;
+      color: white;
+      font-family: monospace;
+      font-size: 1em;
+      outline: none;
+    }
+    #output {
+      min-height: 150px;
+      white-space: pre-wrap;
+    }
+  </style>
+</head>
+<body>
+  <h1><span style="font-weight:bold;">Uzuxer</span></h1>
+  <div><em>Entrada del comando</em></div>
+  <div class="terminal">
+    <span>$ </span><input type="text" id="commandInput" autofocus />
+  </div>
+  <div><em>Salida del comando</em></div>
+  <div class="terminal" id="output"></div>
+
+  <script>
+    const input = document.getElementById('commandInput');
+    const output = document.getElementById('output');
+
+    input.addEventListener('keydown', function(event) {
+      if (event.key === 'Enter') {
+        const command = input.value.trim();
+        processCommand(command);
+        input.value = '';
+      }
+    });
+
+    function appendOutput(text) {
+      output.textContent += text + '\n';
+      output.scrollTop = output.scrollHeight;
+    }
+
+    function processCommand(command) {
+      if (command === '') return;
+
+      // Comando help
+      if (command === 'help') {
+        appendOutput("Comandos disponibles:\nhelp - Muestra esta ayuda\nclear - Limpia la salida\nentr -'codigo' - Redirige a un enlace\ndate - Muestra la fecha actual\necho 'texto' - Muestra el texto");
+        return;
+      }
+
+      // Comando clear
+      if (command === 'clear') {
+        output.textContent = '';
+        return;
+      }
+
+      // Comando date
+      if (command === 'date') {
+        const now = new Date();
+        appendOutput(now.toString());
+        return;
+      }
+
+      // Comando echo
+      if (command.startsWith("echo '") && command.endsWith("'")) {
+        const text = command.slice(6, -1);
+        appendOutput(text);
+        return;
+      }
+
+      // Comando entr
+      if (command.startsWith("entr -'") && command.endsWith("'")) {
+        const code = command.slice(7, -1);
+        const url = "https://example.com/" + encodeURIComponent(code);
+        appendOutput("Redirigiendo a: " + url);
+        setTimeout(() => {
+          window.location.href = url;
+        }, 1000);
+        return;
+      }
+
+      // Comando no reconocido
+      appendOutput("Comando no reconocido. Escribe 'help' para ver la lista de comandos.");
+    }
+  </script>
+</body>
+</html>
