@@ -1,3 +1,14 @@
+Perfecto, vamos a añadir ese comando especial entr -cp que te lleve directamente a:
+
+https://youtu.be/xvFZjo5PgG0?si=vVmKzxA1orS28L8_
+
+Y dejaremos que los demás entr -'codigo' sigan funcionando normalmente.
+
+Aquí tienes el HTML completo listo para usar:
+
+
+---
+
 <!DOCTYPE html>
 <html lang="es">
 <head>
@@ -72,7 +83,14 @@
 
       // Comando help
       if (command === 'help') {
-        appendOutput("Comandos disponibles:\nhelp - Muestra esta ayuda\nclear - Limpia la salida\nentr -'codigo' - Redirige a un enlace\ndate - Muestra la fecha actual\necho 'texto' - Muestra el texto");
+        appendOutput(
+`Comandos disponibles:
+help - Muestra esta ayuda
+clear - Limpia la salida
+entr -'codigo' - Redirige a un enlace
+entr -cp - Redirige al video especial
+date - Muestra la fecha actual
+echo 'texto' - Muestra el texto`);
         return;
       }
 
@@ -96,7 +114,17 @@
         return;
       }
 
-      // Comando entr
+      // Comando especial entr -cp
+      if (command === 'entr -cp') {
+        const url = "https://youtu.be/xvFZjo5PgG0?si=vVmKzxA1orS28L8_";
+        appendOutput("Redirigiendo a: " + url);
+        setTimeout(() => {
+          window.location.href = url;
+        }, 1000);
+        return;
+      }
+
+      // Comando entr -'codigo'
       if (command.startsWith("entr -'") && command.endsWith("'")) {
         const code = command.slice(7, -1);
         const url = "https://example.com/" + encodeURIComponent(code);
@@ -113,3 +141,28 @@
   </script>
 </body>
 </html>
+
+
+---
+
+✅ Nuevo comando añadido:
+
+entr -cp
+
+🔗 Te redirige al video de YouTube que indicaste.
+
+✅ Los demás comandos siguen funcionando:
+
+help
+
+clear
+
+date
+
+echo 'texto'
+
+entr -'codigo' (redirige a https://example.com/codigo)
+
+
+Si quieres, podemos agregar más enlaces, comandos o personalizar estilos. 🚀
+
