@@ -6,183 +6,186 @@
   <title>Uzuxer - Terminal</title>
   <style>
     body {
-      background: linear-gradient(135deg, #ff77a9, #7f5fff);
-      color: #00ffcc;
+      background-color: black;
+      color: white;
       font-family: monospace;
       text-align: center;
       padding: 20px;
     }
-    img.banner {
-      max-width: 80%;
-      border-radius: 15px;
-      box-shadow: 0 0 20px #000;
-      margin-bottom: 20px;
+    h1 img {
+      max-width: 300px;
+    }
+    .login-box {
+      background-color: #111;
+      border: 2px solid white;
+      border-radius: 10px;
+      padding: 20px;
+      width: 300px;
+      margin: 50px auto;
     }
     .terminal {
       background-color: #111;
-      border: 2px solid #00ffcc;
+      border: 2px solid white;
       border-radius: 10px;
-      padding: 15px;
-      width: 85%;
-      margin: 15px auto;
+      padding: 10px;
+      width: 80%;
+      margin: 10px auto;
       text-align: left;
-      min-height: 60px;
-      box-shadow: 0 0 20px rgba(0,255,200,0.6);
+      min-height: 50px;
     }
     input {
       width: 95%;
       background-color: black;
       border: none;
-      color: #0f0;
+      color: white;
       font-family: monospace;
       font-size: 1em;
       outline: none;
     }
+    button {
+      background: black;
+      color: white;
+      border: 1px solid white;
+      padding: 5px 10px;
+      margin-top: 10px;
+      cursor: pointer;
+    }
+    button:hover {
+      background: white;
+      color: black;
+    }
     #output {
-      min-height: 200px;
+      min-height: 150px;
       white-space: pre-wrap;
-      color: #0f0;
-    }
-    a {
-      color: #00aaff;
-      text-decoration: none;
-    }
-    a:hover {
-      text-decoration: underline;
-    }
-    .prompt {
-      color: #ff66cc;
     }
   </style>
 </head>
 <body>
-  <!-- Banner en vez de texto -->
-  <img src="tu_imagen.png" alt="Uzuxer" class="banner">
+  <h1><img src="logo.png" alt="Uzuxer Logo"></h1>
 
-  <div><em>Entrada del comando</em></div>
-  <div class="terminal">
-    <span class="prompt">$ </span><input type="text" id="commandInput" autofocus />
+  <!-- Pantalla de login -->
+  <div id="login" class="login-box">
+    <h2>Login</h2>
+    <input type="text" id="username" placeholder="Usuario" /><br><br>
+    <input type="password" id="password" placeholder="Contraseña" /><br><br>
+    <button onclick="login()">Entrar</button>
+    <button onclick="guestLogin()">Entrar como Invitado</button>
   </div>
-  <div><em>Salida del comando</em></div>
-  <div class="terminal" id="output"></div>
+
+  <!-- Terminal -->
+  <div id="terminalUI" style="display:none;">
+    <div><em>Entrada del comando</em></div>
+    <div class="terminal">
+      <span>$ </span><input type="text" id="commandInput" autofocus />
+    </div>
+    <div><em>Salida del comando</em></div>
+    <div class="terminal" id="output"></div>
+  </div>
 
   <script>
+    let currentUser = "invitado";
+
     const input = document.getElementById('commandInput');
     const output = document.getElementById('output');
-    let history = [];
-    let historyIndex = -1;
+    const loginBox = document.getElementById('login');
+    const terminalUI = document.getElementById('terminalUI');
+
+    function login() {
+      const user = document.getElementById('username').value;
+      const pass = document.getElementById('password').value;
+
+      if (user === "Uzuxer" && pass === "y54pca2w$_T") {
+        currentUser = "Uzuxer";
+        loginBox.style.display = "none";
+        terminalUI.style.display = "block";
+        appendOutput("Bienvenido " + currentUser);
+      } else {
+        alert("Usuario o contraseña incorrectos.");
+      }
+    }
+
+    function guestLogin() {
+      currentUser = "invitado";
+      loginBox.style.display = "none";
+      terminalUI.style.display = "block";
+      appendOutput("Entraste como invitado");
+    }
 
     input.addEventListener('keydown', function(event) {
       if (event.key === 'Enter') {
         const command = input.value.trim();
-        if (command !== '') {
-          history.push(command);
-          historyIndex = history.length;
-        }
         processCommand(command);
         input.value = '';
-      } else if (event.key === 'ArrowUp') {
-        if (historyIndex > 0) {
-          historyIndex--;
-          input.value = history[historyIndex];
-        }
-      } else if (event.key === 'ArrowDown') {
-        if (historyIndex < history.length - 1) {
-          historyIndex++;
-          input.value = history[historyIndex];
-        } else {
-          input.value = '';
-        }
       }
     });
 
-    function appendOutput(text, isHTML = false) {
-      const line = document.createElement("div");
-      if (isHTML) {
-        line.innerHTML = text;
-      } else {
-        line.textContent = text;
-      }
-      output.appendChild(line);
+    function appendOutput(text) {
+      output.textContent += text + '\n';
       output.scrollTop = output.scrollHeight;
-    }
-
-    // Efecto máquina de escribir
-    function typeWriter(text, speed = 20) {
-      let i = 0;
-      const line = document.createElement("div");
-      output.appendChild(line);
-      function typing() {
-        if (i < text.length) {
-          line.textContent += text.charAt(i);
-          i++;
-          setTimeout(typing, speed);
-        }
-      }
-      typing();
     }
 
     function processCommand(command) {
       if (command === '') return;
 
-      // Comando help
+      // help
       if (command === 'help') {
-        typeWriter(
+        appendOutput(
 `Comandos disponibles:
 help - Muestra esta ayuda
 clear - Limpia la salida
 date - Muestra la fecha actual
 echo 'texto' - Muestra el texto
-uname -a - Info del sistema
 whoami - Muestra el usuario actual
-github - Muestra link al GitHub
-entr -cp - Link especial
-entr -'codigo' - Redirige a enlace`
-        );
+entr -cp - Redirige a un enlace especial
+entr -'codigo' - Redirige a un enlace
+games - Juegos disponibles
+calc [expresión] - Calculadora
+about - Info del sistema
+time - Hora actual
+rand - Número aleatorio
+reverse 'texto' - Invierte el texto
+len 'texto' - Largo del texto
+upper 'texto' - Mayúsculas
+lower 'texto' - Minúsculas`);
         return;
       }
 
-      // Comando clear
+      // clear
       if (command === 'clear') {
         output.textContent = '';
         return;
       }
 
-      // Comando date
+      // date
       if (command === 'date') {
-        typeWriter(new Date().toString());
+        appendOutput(new Date().toDateString());
         return;
       }
 
-      // Comando echo
+      // time
+      if (command === 'time') {
+        appendOutput(new Date().toLocaleTimeString());
+        return;
+      }
+
+      // echo
       if (command.startsWith("echo '") && command.endsWith("'")) {
         const text = command.slice(6, -1);
-        typeWriter(text);
-        return;
-      }
-
-      // uname -a (fake)
-      if (command === 'uname -a') {
-        typeWriter("UzuxerOS 1.0.0 Uzuxer-Terminal x86_64 Virtual");
+        appendOutput(text);
         return;
       }
 
       // whoami
       if (command === 'whoami') {
-        typeWriter("usuario: uzuxer");
-        return;
-      }
-
-      // github
-      if (command === 'github') {
-        appendOutput("GitHub: <a href='https://github.com/' target='_blank'>https://github.com/</a>", true);
+        appendOutput(currentUser);
         return;
       }
 
       // entr -cp
       if (command === 'entr -cp') {
         const url = "https://youtu.be/xvFZjo5PgG0?si=vVmKzxA1orS28L8_";
-        appendOutput("Haz clic aquí: <a href='" + url + "' target='_blank'>" + url + "</a>", true);
+        appendOutput("Redirigiendo a: " + url);
+        setTimeout(() => { window.location.href = url; }, 1000);
         return;
       }
 
@@ -190,12 +193,70 @@ entr -'codigo' - Redirige a enlace`
       if (command.startsWith("entr -'") && command.endsWith("'")) {
         const code = command.slice(7, -1);
         const url = "https://example.com/" + encodeURIComponent(code);
-        appendOutput("Haz clic aquí: <a href='" + url + "' target='_blank'>" + url + "</a>", true);
+        appendOutput("Redirigiendo a: " + url);
+        setTimeout(() => { window.location.href = url; }, 1000);
         return;
       }
 
-      // Comando no reconocido
-      typeWriter("Comando no reconocido. Escribe 'help' para ver la lista de comandos.");
+      // games
+      if (command === 'games') {
+        appendOutput("Juegos disponibles: snake, pong (próximamente)");
+        return;
+      }
+
+      // calc
+      if (command.startsWith("calc ")) {
+        try {
+          const expr = command.slice(5);
+          const result = eval(expr);
+          appendOutput("Resultado: " + result);
+        } catch {
+          appendOutput("Error en la expresión.");
+        }
+        return;
+      }
+
+      // about
+      if (command === 'about') {
+        appendOutput("Uzuxer Terminal v1.0 - Proyecto en desarrollo 🚀");
+        return;
+      }
+
+      // rand
+      if (command === 'rand') {
+        appendOutput("Número aleatorio: " + Math.floor(Math.random() * 1000));
+        return;
+      }
+
+      // reverse
+      if (command.startsWith("reverse '") && command.endsWith("'")) {
+        const text = command.slice(9, -1);
+        appendOutput(text.split('').reverse().join(''));
+        return;
+      }
+
+      // len
+      if (command.startsWith("len '") && command.endsWith("'")) {
+        const text = command.slice(5, -1);
+        appendOutput("Longitud: " + text.length);
+        return;
+      }
+
+      // upper
+      if (command.startsWith("upper '") && command.endsWith("'")) {
+        const text = command.slice(7, -1);
+        appendOutput(text.toUpperCase());
+        return;
+      }
+
+      // lower
+      if (command.startsWith("lower '") && command.endsWith("'")) {
+        const text = command.slice(7, -1);
+        appendOutput(text.toLowerCase());
+        return;
+      }
+
+      appendOutput("Comando no reconocido. Escribe 'help' para ver la lista.");
     }
   </script>
 </body>
