@@ -6,46 +6,62 @@
   <title>Uzuxer - Terminal</title>
   <style>
     body {
-      background-color: black;
-      color: white;
+      background: linear-gradient(135deg, #ff77a9, #7f5fff);
+      color: #00ffcc;
       font-family: monospace;
       text-align: center;
       padding: 20px;
     }
-    h1 {
-      font-size: 2em;
+    img.banner {
+      max-width: 80%;
+      border-radius: 15px;
+      box-shadow: 0 0 20px #000;
       margin-bottom: 20px;
     }
     .terminal {
       background-color: #111;
-      border: 2px solid white;
+      border: 2px solid #00ffcc;
       border-radius: 10px;
-      padding: 10px;
-      width: 80%;
-      margin: 10px auto;
+      padding: 15px;
+      width: 85%;
+      margin: 15px auto;
       text-align: left;
-      min-height: 50px;
+      min-height: 60px;
+      box-shadow: 0 0 20px rgba(0,255,200,0.6);
     }
     input {
       width: 95%;
       background-color: black;
       border: none;
-      color: white;
+      color: #0f0;
       font-family: monospace;
       font-size: 1em;
       outline: none;
     }
     #output {
-      min-height: 150px;
+      min-height: 200px;
       white-space: pre-wrap;
+      color: #0f0;
+    }
+    a {
+      color: #00aaff;
+      text-decoration: none;
+    }
+    a:hover {
+      text-decoration: underline;
+    }
+    .prompt {
+      color: #ff66cc;
     }
   </style>
 </head>
 <body>
-  <h1><span style="font-weight:bold;">Uzuxer</span></h1>
+  <!-- Banner en vez de texto -->
+  <img src="tu_imagen.png" alt="Uzuxer" class="banner">
+
   <div><em>Entrada del comando</em></div>
   <div class="terminal">
-    <span>$ </span><input type="text" id="commandInput" autofocus />
+    <span class="prompt">$ </span><input type="text" id="commandInput" autofocus />
   </div>
   <div><em>Salida del comando</em></div>
   <div class="terminal" id="output"></div>
@@ -53,18 +69,57 @@
   <script>
     const input = document.getElementById('commandInput');
     const output = document.getElementById('output');
+    let history = [];
+    let historyIndex = -1;
 
     input.addEventListener('keydown', function(event) {
       if (event.key === 'Enter') {
         const command = input.value.trim();
+        if (command !== '') {
+          history.push(command);
+          historyIndex = history.length;
+        }
         processCommand(command);
         input.value = '';
+      } else if (event.key === 'ArrowUp') {
+        if (historyIndex > 0) {
+          historyIndex--;
+          input.value = history[historyIndex];
+        }
+      } else if (event.key === 'ArrowDown') {
+        if (historyIndex < history.length - 1) {
+          historyIndex++;
+          input.value = history[historyIndex];
+        } else {
+          input.value = '';
+        }
       }
     });
 
-    function appendOutput(text) {
-      output.textContent += text + '\n';
+    function appendOutput(text, isHTML = false) {
+      const line = document.createElement("div");
+      if (isHTML) {
+        line.innerHTML = text;
+      } else {
+        line.textContent = text;
+      }
+      output.appendChild(line);
       output.scrollTop = output.scrollHeight;
+    }
+
+    // Efecto máquina de escribir
+    function typeWriter(text, speed = 20) {
+      let i = 0;
+      const line = document.createElement("div");
+      output.appendChild(line);
+      function typing() {
+        if (i < text.length) {
+          line.textContent += text.charAt(i);
+          i++;
+          setTimeout(typing, speed);
+        }
+      }
+      typing();
     }
 
     function processCommand(command) {
@@ -72,13 +127,18 @@
 
       // Comando help
       if (command === 'help') {
-        appendOutput(
+        typeWriter(
 `Comandos disponibles:
 help - Muestra esta ayuda
 clear - Limpia la salida
-entr -[codigo] - Redirige a un enlace
 date - Muestra la fecha actual
-echo 'texto' - Muestra el texto`);
+echo 'texto' - Muestra el texto
+uname -a - Info del sistema
+whoami - Muestra el usuario actual
+github - Muestra link al GitHub
+entr -cp - Link especial
+entr -'codigo' - Redirige a enlace`
+        );
         return;
       }
 
@@ -90,41 +150,52 @@ echo 'texto' - Muestra el texto`);
 
       // Comando date
       if (command === 'date') {
-        const now = new Date();
-        appendOutput(now.toString());
+        typeWriter(new Date().toString());
         return;
       }
 
       // Comando echo
       if (command.startsWith("echo '") && command.endsWith("'")) {
         const text = command.slice(6, -1);
-        appendOutput(text);
+        typeWriter(text);
         return;
       }
 
-      // Comando especial entr -cp
+      // uname -a (fake)
+      if (command === 'uname -a') {
+        typeWriter("UzuxerOS 1.0.0 Uzuxer-Terminal x86_64 Virtual");
+        return;
+      }
+
+      // whoami
+      if (command === 'whoami') {
+        typeWriter("usuario: uzuxer");
+        return;
+      }
+
+      // github
+      if (command === 'github') {
+        appendOutput("GitHub: <a href='https://github.com/' target='_blank'>https://github.com/</a>", true);
+        return;
+      }
+
+      // entr -cp
       if (command === 'entr -cp') {
         const url = "https://youtu.be/xvFZjo5PgG0?si=vVmKzxA1orS28L8_";
-        appendOutput("Redirigiendo a: " + url);
-        setTimeout(() => {
-          window.location.href = url;
-        }, 1000);
+        appendOutput("Haz clic aquí: <a href='" + url + "' target='_blank'>" + url + "</a>", true);
         return;
       }
 
-      // Comando entr -'codigo'
+      // entr -'codigo'
       if (command.startsWith("entr -'") && command.endsWith("'")) {
         const code = command.slice(7, -1);
         const url = "https://example.com/" + encodeURIComponent(code);
-        appendOutput("Redirigiendo a: " + url);
-        setTimeout(() => {
-          window.location.href = url;
-        }, 1000);
+        appendOutput("Haz clic aquí: <a href='" + url + "' target='_blank'>" + url + "</a>", true);
         return;
       }
 
       // Comando no reconocido
-      appendOutput("Comando no reconocido. Escribe 'help' para ver la lista de comandos.");
+      typeWriter("Comando no reconocido. Escribe 'help' para ver la lista de comandos.");
     }
   </script>
 </body>
