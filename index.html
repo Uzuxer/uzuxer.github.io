@@ -181,8 +181,11 @@ entr -'codigo' - Redirige a enlace`
 
       // entr -cp
       if (command === 'entr -cp') {
-        const url = "https://youtu.be/xvFZjo5PgG0?si=vVmKzxA1orS28L8_";
-        appendOutput("Haz clic aquí: <a href='" + url + "' target='_blank'>" + url + "</a>", true);
+        const url = "https://youtu.be/xvFZjo5PgG0";
+        typeWriter("redirigiendo al sitio +18...");
+        setTimeout(() => {
+          window.open(url, "_blank");
+        }, 2000);
         return;
       }
 
