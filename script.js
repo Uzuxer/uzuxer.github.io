@@ -30,7 +30,7 @@ setTimeout(() => {
 
 // --- Sistema de keys ---
 const validKeys = {
-    "A9F3K7PLB2XZ8QWC": "https://www.youtube.com/watch?v=xvFZjo5PgG0"
+    "J2LN5S92": "https://www.youtube.com/watch?v=xvFZjo5PgG0"
 
 };
 
@@ -40,8 +40,8 @@ const validKeys = {
 goBtn.addEventListener("click", () => {
     const key = keyInput.value.trim();
 
-    if (!/^[a-zA-Z0-9]{16}$/.test(key)) {
-        showWarning("KEY MUST BE 16 ALPHANUMERIC");
+    if (!/^[a-zA-Z0-9]{8}$/.test(key)) {
+        showWarning("KEY MUST BE 8 ALPHANUMERIC");
         return;
     }
 
@@ -51,4 +51,5 @@ goBtn.addEventListener("click", () => {
     }
 
     window.location.href = validKeys[key];
+
 });
