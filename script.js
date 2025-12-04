@@ -36,6 +36,7 @@ const validKeys = {
 
 // Añadir más keys:
 // validKeys["1234567890ABCDEF"] = "https://tulink.com";
+validKeys["WRC4GAME"] = "https://www.mediafire.com/file/pmqjids6x73xvd0/WRC_4_F14_W8rld_R4lly_Ch4mp18nsh1p_%25281ncl._Upd4t3_1%2529.rar/file";
 
 goBtn.addEventListener("click", () => {
     const key = keyInput.value.trim();
@@ -53,3 +54,4 @@ goBtn.addEventListener("click", () => {
     window.location.href = validKeys[key];
 
 });
+
